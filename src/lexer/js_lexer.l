@@ -19,8 +19,8 @@
 [0-9]+                   { yylval.num = atoi(yytext); return NUM; }
 \"[^\"]*\"               { yylval.str = strdup(yytext); return STRING; }
 
-"=="|"!="|"<="|">="      { return RELOP; }
-"+"|"-"|"*"|"/"          { return ADDOP; }
+"=="|"!="|"<="|">="      { yylval.op = strdup(yytext); return RELOP; }
+"+"|"-"|"*"|"/"          { yylval.op = strdup(yytext); return ADDOP; }
 
 "/*"([^*]|\n|(\*+([^*/]|\n)))*\*+"/"   { /* comentario bloque */ }
 "//".*                   { /* comentario línea */ }
