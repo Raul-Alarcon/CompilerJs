@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast.h"
+#include "../ast/ast.h"
 
 static int temp = 0;
 
