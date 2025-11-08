@@ -24,30 +24,30 @@ compilador-js-c/
 ## Run Locally  
 Clone the project  
 
-~~~bash  
+```bash  
   git clone https://github.com/Raul-Alarcon/CompilerJs.git
-~~~
+```
 
 Go to the project directory  
 
-~~~bash  
+```bash  
   cd CompilerJs
-~~~
+```
 
 Build  
 
-~~~bash  
+```bash  
 make
-~~~
+```
 
 Start 
 
-~~~bash  
+```bash  
 ./scripts/run.sh < examples/hello.js
-~~~  
+```
 
 Build Clean  
 
-~~~bash  
+```bash  
 make clean
-~~~
+```
