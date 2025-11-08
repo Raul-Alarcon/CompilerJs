@@ -22,8 +22,8 @@ $(BUILD)/lex.yy.c: src/lexer/js_lexer.l | $(BUILD)
 
 # === Generar parser (Bison) ===
 $(BUILD)/y.tab.c $(BUILD)/y.tab.h: src/parser/js_parser.y | $(BUILD)
-	$(BISON) -d -o $(BUILD)/y.tab.c $<
-	@cp $(BUILD)/y.tab.h $(BUILD)/y.tab.h 2>/dev/null || true
+	$(BISON) -d -o $(BUILD)/y.tab.c src/parser/js_parser.y --defines=$(BUILD)/y.tab.h
+
 
 # === Compilaciones individuales ===
 $(BUILD)/lex.yy.o: $(BUILD)/lex.yy.c $(BUILD)/y.tab.h
