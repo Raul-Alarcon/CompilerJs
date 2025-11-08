@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ast.h"
-#include "symbol_table.h"
+#include "../ast/ast.h"
+#include "../semantic/symbol_table.h"
 
 extern int yylex();
 void yyerror(const char *s);
