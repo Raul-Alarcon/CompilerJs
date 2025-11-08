@@ -8,6 +8,8 @@
 extern int yylex();
 void yyerror(const char *s);
 ASTNode* ast_root;
+
+typedef struct ASTNode ASTNode;
 %}
 
 %union {
