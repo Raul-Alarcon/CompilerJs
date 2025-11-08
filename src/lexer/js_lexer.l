@@ -1,8 +1,9 @@
 %{ 
-#include "../../build/y.tab.h"
-#include "../ast/ast.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include "../ast/ast.h"
+#include "../semantic/symbol_table.h"
+#include "../../build/y.tab.h"
 %}
 
 %%
