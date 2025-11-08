@@ -1,9 +1,8 @@
 %{
+#include "parser.h"
+#include "ast.h"
 #include <string.h>
 #include <stdlib.h>
-#include "y.tab.h"   /* tokens from bison */
-#include "ast.h"
-extern int yylval;
 %}
 
 %%
@@ -13,35 +12,22 @@ extern int yylval;
 "if"                     { return IF; }
 "else"                   { return ELSE; }
 "return"                 { return RETURN; }
-"true"                  { yylval.bool_val = 1; return BOOL; }
-"false"                 { yylval.bool_val = 0; return BOOL; }
+"true"|"false"           { yylval.bool_val = (strcmp(yytext,"true")==0); return BOOL; }
 
-[a-zA-Z_$][a-zA-Z0-9_$]* {
-    yylval.id = strdup(yytext);
-    return ID;
-}
+[a-zA-Z_$][a-zA-Z0-9_$]* { yylval.id = strdup(yytext); return ID; }
+[0-9]+                   { yylval.num = atoi(yytext); return NUM; }
+\"[^\"]*\"               { yylval.str = strdup(yytext); return STRING; }
 
-[0-9]+ {
-    yylval.num = atoi(yytext);
-    return NUM;
-}
+"=="|"!="|"<="|">="      { return RELOP; }
+"+"|"-"|"*"|"/"          { return ADDOP; }
 
-\"[^\"]*\" {
-    /* strip quotes */
-    int len = yyleng - 2;
-    char *s = malloc(len + 1);
-    if(len > 0) strncpy(s, yytext+1, len);
-    s[len] = '\0';
-    yylval.str = s;
-    return STRING;
-}
+"/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/   { /* comentario bloque */ }
+"//".*                   { /* comentario línea */ }
 
-/"=="| "!=" | "<=" | ">="     { return RELOP; }
-"+"|"-"|"*"|"/"               { yylval.op = strdup(yytext); return ADDOP; }
+[ \t\n]+                 { /* ignorar */ }
 
-"/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/   { /* block comment */ }
-"//".*                   { /* line comment */ }
-[ \t\r\n]+               { /* ignore whitespace */ }
 .                        { return yytext[0]; }
 
 %%
+
+int yywrap(void) { return 1; }
