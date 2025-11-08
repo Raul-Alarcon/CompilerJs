@@ -27,7 +27,7 @@ typedef struct ASTNode ASTNode;
 %token <bool_val> BOOL
 %token VAR FUNCTION IF ELSE RETURN
 %token <op> ADDOP
-%token RELOP
+%token <op> RELOP
 
 %type <ast> expr stmt stmt_list block program
 
