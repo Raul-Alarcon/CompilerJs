@@ -1,0 +1,63 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "ast.h"
+#include "symbol_table.h"
+
+extern int yylex();
+void yyerror(const char *s);
+ASTNode* ast_root;
+%}
+
+%union {
+    int num;
+    char* id;
+    char* str;
+    int bool_val;
+    ASTNode* ast;
+    char* op;
+}
+
+%token <id> ID
+%token <num> NUM
+%token <str> STRING
+%token <bool_val> BOOL
+%token VAR FUNCTION IF ELSE RETURN
+%token <op> ADDOP
+%token RELOP
+
+%type <ast> expr stmt stmt_list block program
+
+%%
+
+program: stmt_list            { ast_root = $1; }
+       ;
+
+stmt_list:
+      | stmt_list stmt        { $$ = appendStmtList($1, $2); }
+      | stmt                 { $$ = makeStmtList($1); }
+      ;
+
+stmt:
+      VAR ID '=' expr ';'    { $$ = newAssign($2, $4); insert_symbol($2, TYPE_NUMBER); }
+    | FUNCTION ID '(' ')' block { $$ = newFunction($2, $5); insert_symbol($2, TYPE_FUNCTION); }
+    | IF '(' expr ')' block  { $$ = newIf($3, $5, NULL); }
+    | RETURN expr ';'        { $$ = newReturn($2); }
+    ;
+
+block:
+    '{' stmt_list '}'        { $$ = newBlock($2); }
+    ;
+
+expr:
+      NUM                    { $$ = newNum($1); }
+    | ID                     { $$ = newId($1); }
+    | expr ADDOP expr        { $$ = newBinOp($1, $3, $2); }
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Parse error: %s\n", s);
+}
