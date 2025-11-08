@@ -59,7 +59,9 @@ expr
     : NUM                              { $$ = newNum($1); }
     | ID                               { $$ = newId($1); }
     | expr ADDOP expr                  { $$ = newBinOp($1, $3, $2); }
+    | expr RELOP expr                  { $$ = newBinOp($1, $3, $2); }
     ;
+
 
 %%
 
