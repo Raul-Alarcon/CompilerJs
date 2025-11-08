@@ -33,29 +33,32 @@ typedef struct ASTNode ASTNode;
 
 %%
 
-program: stmt_list            { ast_root = $1; }
-       ;
-
-stmt_list:
-      | stmt_list stmt        { $$ = appendStmtList($1, $2); }
-      | stmt                 { $$ = makeStmtList($1); }
-      ;
-
-stmt:
-      VAR ID '=' expr ';'    { $$ = newAssign($2, $4); insert_symbol($2, TYPE_NUMBER); }
-    | FUNCTION ID '(' ')' block { $$ = newFunction($2, $5); insert_symbol($2, TYPE_FUNCTION); }
-    | IF '(' expr ')' block  { $$ = newIf($3, $5, NULL); }
-    | RETURN expr ';'        { $$ = newReturn($2); }
+program
+    : stmt_list              { ast_root = $1; }
     ;
 
-block:
-    '{' stmt_list '}'        { $$ = newBlock($2); }
+stmt_list
+    : /* vacío */            { $$ = NULL; } 
+    | stmt                   { $$ = makeStmtList($1); }
+    | stmt_list stmt          { $$ = appendStmtList($1, $2); }
     ;
 
-expr:
-      NUM                    { $$ = newNum($1); }
-    | ID                     { $$ = newId($1); }
-    | expr ADDOP expr        { $$ = newBinOp($1, $3, $2); }
+stmt
+    : VAR ID '=' expr ';'              { $$ = newAssign($2, $4); insert_symbol($2, TYPE_NUMBER); }
+    | FUNCTION ID '(' ')' block        { $$ = newFunction($2, $5); insert_symbol($2, TYPE_FUNCTION); }
+    | IF '(' expr ')' block            { $$ = newIf($3, $5, NULL); }
+    | IF '(' expr ')' block ELSE block { $$ = newIf($3, $5, $7); }
+    | RETURN expr ';'                  { $$ = newReturn($2); }
+    ;
+
+block
+    : '{' stmt_list '}'                { $$ = newBlock($2); }
+    ;
+
+expr
+    : NUM                              { $$ = newNum($1); }
+    | ID                               { $$ = newId($1); }
+    | expr ADDOP expr                  { $$ = newBinOp($1, $3, $2); }
     ;
 
 %%

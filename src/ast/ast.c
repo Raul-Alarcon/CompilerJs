@@ -71,17 +71,72 @@ ASTNode* appendStmtList(ASTNode* list, ASTNode* stmt) {
     return list;
 }
 
+ASTNode* newIf(ASTNode* cond, ASTNode* thenBranch, ASTNode* elseBranch) {
+    ASTNode* node = malloc(sizeof(ASTNode));
+    node->type = NODE_IF;
+    node->left = cond;
+    node->right = thenBranch;
+    node->next = elseBranch;
+    node->id = NULL;
+    node->op = NULL;
+    node->num = 0;
+    return node;
+}
+
 void printAST(ASTNode* node, int level) {
     if (!node) return;
     switch(node->type) {
-        case NODE_NUM: printf("%sNUM(%d)\n", indent(level), node->num); break;
-        case NODE_ID: printf("%sID(%s)\n", indent(level), node->id); break;
-        case NODE_BINOP: printf("%sBINOP(%s)\n", indent(level), node->op); printAST(node->left, level+2); printAST(node->right, level+2); break;
-        case NODE_ASSIGN: printf("%sASSIGN(%s)\n", indent(level), node->id); printAST(node->left, level+2); break;
-        case NODE_RETURN: printf("%sRETURN\n", indent(level)); printAST(node->left, level+2); break;
-        case NODE_FUNCTION: printf("%sFUNCTION %s\n", indent(level), node->id); printAST(node->left, level+2); break;
-        case NODE_BLOCK: printf("%sBLOCK\n", indent(level)); printAST(node->left, level+2); break;
-        case NODE_STMTLIST: printf("%sSTMTLIST\n", indent(level)); { ASTNode* cur = node->next; while(cur) { printAST(cur, level+2); cur = cur->next; } } break;
-        default: printf("%sUNKNOWN\n", indent(level)); break;
+        case NODE_NUM:
+            printf("%sNUM(%d)\n", indent(level), node->num);
+            break;
+        case NODE_ID:
+            printf("%sID(%s)\n", indent(level), node->id);
+            break;
+        case NODE_BINOP:
+            printf("%sBINOP(%s)\n", indent(level), node->op);
+            printAST(node->left, level+2);
+            printAST(node->right, level+2);
+            break;
+        case NODE_ASSIGN:
+            printf("%sASSIGN(%s)\n", indent(level), node->id);
+            printAST(node->left, level+2);
+            break;
+        case NODE_RETURN:
+            printf("%sRETURN\n", indent(level));
+            printAST(node->left, level+2);
+            break;
+        case NODE_FUNCTION:
+            printf("%sFUNCTION %s\n", indent(level), node->id);
+            printAST(node->left, level+2);
+            break;
+        case NODE_BLOCK:
+            printf("%sBLOCK\n", indent(level));
+            printAST(node->left, level+2);
+            break;
+        case NODE_STMTLIST:
+            printf("%sSTMTLIST\n", indent(level));
+            {
+                ASTNode* cur = node->next;
+                while (cur) {
+                    printAST(cur, level+2);
+                    cur = cur->next;
+                }
+            }
+            break;
+        case NODE_IF:
+            printf("%sIF\n", indent(level));
+            printf("%sCondition:\n", indent(level+2));
+            printAST(node->left, level+4);
+            printf("%sThen:\n", indent(level+2));
+            printAST(node->right, level+4);
+            if (node->next) {
+                printf("%sElse:\n", indent(level+2));
+                printAST(node->next, level+4);
+            }
+            break;
+        default:
+            printf("%sUNKNOWN\n", indent(level));
+            break;
     }
 }
+
