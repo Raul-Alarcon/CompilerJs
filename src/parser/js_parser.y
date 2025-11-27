@@ -46,11 +46,13 @@ stmt_list
 
 stmt
     : VAR ID '=' expr ';'              { $$ = newAssign($2, $4); insert_symbol($2, TYPE_NUMBER); }
+    | ID '=' expr ';'                  { $$ = newAssign($1, $3); }
     | FUNCTION ID '(' ')' block        { $$ = newFunction($2, $5); insert_symbol($2, TYPE_FUNCTION); }
     | IF '(' expr ')' block            { $$ = newIf($3, $5, NULL); }
     | IF '(' expr ')' block ELSE block { $$ = newIf($3, $5, $7); }
     | WHILE '(' expr ')' block         { $$ = newWhile($3, $5); }
     | RETURN expr ';'                  { $$ = newReturn($2); }
+    | block                              { $$ = $1; }
     ;
 
 block
@@ -62,6 +64,7 @@ expr
     | ID                               { $$ = newId($1); }
     | expr ADDOP expr                  { $$ = newBinOp($1, $3, $2); }
     | expr RELOP expr                  { $$ = newBinOp($1, $3, $2); }
+    | '(' expr ')'        { $$ = $2; }
     ;
 
 
