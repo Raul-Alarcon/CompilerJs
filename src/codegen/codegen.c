@@ -13,22 +13,27 @@ char *newLabel()
 }
 int newTemp() { return temp++; }
 
-int generate_expr(ASTNode* node) {
-    switch (node->type) {
+int generate_expr(ASTNode *node)
+{
+    switch (node->type)
+    {
 
-    case NODE_NUM: {
+    case NODE_NUM:
+    {
         int t = newTemp();
         printf("t%d = %d\n", t, node->num);
         return t;
     }
 
-    case NODE_ID: {
+    case NODE_ID:
+    {
         int t = newTemp();
         printf("t%d = %s\n", t, node->id);
         return t;
     }
 
-    case NODE_BINOP: {
+    case NODE_BINOP:
+    {
         int l = generate_expr(node->left);
         int r = generate_expr(node->right);
         int t = newTemp();
@@ -42,25 +47,30 @@ int generate_expr(ASTNode* node) {
     }
 }
 
-void generate_stmt(ASTNode* node) {
+void generate_stmt(ASTNode *node)
+{
 
-    switch (node->type) {
+    switch (node->type)
+    {
 
-    case NODE_ASSIGN: {
-        int t = generate_expr(node->left);    
+    case NODE_ASSIGN:
+    {
+        int t = generate_expr(node->left);
         printf("STORE %s <- t%d\n", node->id, t);
         break;
     }
 
-    case NODE_RETURN: {
+    case NODE_RETURN:
+    {
         int t = generate_expr(node->left);
         printf("RETURN t%d\n", t);
         break;
     }
 
-    case NODE_IF: {
-        char* Ltrue = newLabel();
-        char* Lend = newLabel();
+    case NODE_IF:
+    {
+        char *Ltrue = newLabel();
+        char *Lend = newLabel();
 
         int cond = generate_expr(node->left);
 
@@ -74,22 +84,26 @@ void generate_stmt(ASTNode* node) {
         break;
     }
 
-    case NODE_FOR: {
+    case NODE_FOR:
+    {
         char *Lstart = newLabel();
-        char *Lbody  = newLabel();
-        char *Lstep  = newLabel();
-        char *Lend   = newLabel();
+        char *Lbody = newLabel();
+        char *Lstep = newLabel();
+        char *Lend = newLabel();
 
         if (node->init)
             generate_stmt(node->init);
 
         printf("%s:\n", Lstart);
 
-        if (node->cond) {
+        if (node->cond)
+        {
             int cond = generate_expr(node->cond);
             printf("IF t%d GOTO %s\n", cond, Lbody);
             printf("GOTO %s\n", Lend);
-        } else {
+        }
+        else
+        {
             printf("GOTO %s\n", Lbody);
         }
 
@@ -109,12 +123,35 @@ void generate_stmt(ASTNode* node) {
         generate_stmt(node->left);
         break;
 
-    case NODE_STMTLIST: {
-        ASTNode* cur = node->next;
-        while (cur) {
+    case NODE_STMTLIST:
+    {
+        ASTNode *cur = node->next;
+        while (cur)
+        {
             generate_stmt(cur);
             cur = cur->next;
         }
+        break;
+    }
+
+    case NODE_WHILE:
+    {
+        char *Lstart = newLabel();
+        char *Lbody = newLabel();
+        char *Lend = newLabel();
+ 
+        printf("%s:\n", Lstart);
+ 
+        int cond = generate_expr(node->left);
+        printf("IF t%d GOTO %s\n", cond, Lbody);
+        printf("GOTO %s\n", Lend);
+ 
+        printf("%s:\n", Lbody);
+        generate_stmt(node->right);
+ 
+        printf("GOTO %s\n", Lstart); 
+        printf("%s:\n", Lend);
+
         break;
     }
 
@@ -123,7 +160,8 @@ void generate_stmt(ASTNode* node) {
         exit(1);
     }
 }
- 
-void generate_ir(ASTNode* root) {
+
+void generate_ir(ASTNode *root)
+{
     generate_stmt(root);
 }
