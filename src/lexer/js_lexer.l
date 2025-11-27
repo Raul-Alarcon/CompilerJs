@@ -13,6 +13,7 @@
 "if"                     { return IF; }
 "else"                   { return ELSE; }
 "while"                  { return WHILE; }
+"for"                    { return FOR; }
 "return"                 { return RETURN; }
 "true"|"false"           { yylval.bool_val = (strcmp(yytext, "true") == 0); return BOOL; }
 

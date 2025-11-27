@@ -107,6 +107,19 @@ ASTNode *newWhile(ASTNode *cond, ASTNode *body)
     return node;
 }
 
+ASTNode *newFor(ASTNode *init, ASTNode *cond, ASTNode *step, ASTNode *body)
+{
+    ASTNode *node = calloc(1, sizeof(ASTNode));
+    node->type = NODE_FOR;
+
+    node->init = init;
+    node->cond = cond;
+    node->step = step;
+    node->body = body;
+
+    return node;
+}
+
 void printAST(ASTNode *node, int level)
 {
     if (!node)
@@ -169,6 +182,21 @@ void printAST(ASTNode *node, int level)
         printAST(node->left, level + 4);
         printf("%sBody:\n", indent(level + 2));
         printAST(node->right, level + 4);
+        break;
+    case NODE_FOR:
+        printf("%sFOR\n", indent(level));
+
+        printf("%sInit:\n", indent(level + 2));
+        printAST(node->init, level + 4);
+
+        printf("%sCondition:\n", indent(level + 2));
+        printAST(node->cond, level + 4);
+
+        printf("%sStep:\n", indent(level + 2));
+        printAST(node->step, level + 4);
+
+        printf("%sBody:\n", indent(level + 2));
+        printAST(node->body, level + 4);
         break;
     default:
         printf("%sUNKNOWN\n", indent(level));
