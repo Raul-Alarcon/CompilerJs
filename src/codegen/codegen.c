@@ -75,7 +75,33 @@ void generate_ir(ASTNode* node) {
             printf("%s:\n", Lend);
             break;
         }
-
+        case NODE_FOR: { 
+            char *Lstart = newLabel();
+            char *Lbody = newLabel();
+            char *Lend = newLabel();
+ 
+            if (node->init) generate_ir(node->init);
+ 
+            printf("%s:\n", Lstart);
+ 
+            if (node->cond) {
+                generate_ir(node->cond);                      
+                printf("IF t%d GOTO %s\n", temp-1, Lbody);
+                printf("GOTO %s\n", Lend);
+            } else { 
+                printf("GOTO %s\n", Lbody);
+            }
+ 
+            printf("%s:\n", Lbody);
+            if (node->body) generate_ir(node->body);
+ 
+            if (node->step) generate_ir(node->step);
+ 
+            printf("GOTO %s\n", Lstart);
+ 
+            printf("%s:\n", Lend);
+            break;
+        }
         default: 
             break;
     }
