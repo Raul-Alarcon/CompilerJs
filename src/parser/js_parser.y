@@ -52,7 +52,7 @@ stmt
     | IF '(' expr ')' block            { $$ = newIf($3, $5, NULL); }
     | IF '(' expr ')' block ELSE block { $$ = newIf($3, $5, $7); }
     | WHILE '(' expr ')' block         { $$ = newWhile($3, $5); }
-    | FOR '(' stmt expr ';' expr ')' block  { $$ = newFor($3, $4, $6, $8); }
+    | FOR '(' stmt expr ';' stmt ')' block  { $$ = newFor($3, $4, $6, $8); }
     | RETURN expr ';'                  { $$ = newReturn($2); }
     | block                              { $$ = $1; }
     ;
