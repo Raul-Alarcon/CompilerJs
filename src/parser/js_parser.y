@@ -31,12 +31,17 @@ typedef struct ASTNode ASTNode;
 %token WHILE
 %token FOR
 
-%type <ast> expr stmt stmt_list block program
+%type <ast> expr stmt stmt_list block program simple_stmt
 
 %%
 
 program
     : stmt_list              { ast_root = $1; }
+    ;
+
+simple_stmt
+    : ID '=' expr         { $$ = newAssign($1, $3); }
+    | VAR ID '=' expr     { $$ = newAssign($2, $4); insert_symbol($2, TYPE_NUMBER); }
     ;
 
 stmt_list
@@ -52,7 +57,7 @@ stmt
     | IF '(' expr ')' block            { $$ = newIf($3, $5, NULL); }
     | IF '(' expr ')' block ELSE block { $$ = newIf($3, $5, $7); }
     | WHILE '(' expr ')' block         { $$ = newWhile($3, $5); }
-    | FOR '(' stmt expr ';' stmt ')' block  { $$ = newFor($3, $4, $6, $8); }
+    | FOR '(' simple_stmt ';' expr ';' simple_stmt ')' block  { $$ = newFor($3, $5, $7, $9); }
     | RETURN expr ';'                  { $$ = newReturn($2); }
     | block                              { $$ = $1; }
     ;
