@@ -28,6 +28,7 @@ typedef struct ASTNode ASTNode;
 %token VAR FUNCTION IF ELSE RETURN
 %token <op> ADDOP
 %token <op> RELOP
+%token WHILE
 
 %type <ast> expr stmt stmt_list block program
 
@@ -48,6 +49,7 @@ stmt
     | FUNCTION ID '(' ')' block        { $$ = newFunction($2, $5); insert_symbol($2, TYPE_FUNCTION); }
     | IF '(' expr ')' block            { $$ = newIf($3, $5, NULL); }
     | IF '(' expr ')' block ELSE block { $$ = newIf($3, $5, $7); }
+    | WHILE '(' expr ')' block         { $$ = newWhile($3, $5); }
     | RETURN expr ';'                  { $$ = newReturn($2); }
     ;
 
