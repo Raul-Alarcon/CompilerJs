@@ -22,7 +22,13 @@
 
 [a-zA-Z_$][a-zA-Z0-9_$]* { yylval.id = strdup(yytext); return ID; }
 [0-9]+                   { yylval.num = atoi(yytext); return NUM; }
-\"[^\"]*\"               { yylval.str = strdup(yytext); return STRING; }
+\"([^"]*)\"              { 
+                            int len = yyleng - 2; 
+                            yylval.str = (char*)malloc(len + 1);
+                            strncpy(yylval.str, yytext + 1, len);
+                            yylval.str[len] = '\0';
+                            return STRING;
+                         }
 
 "=="|"!="|"<="|">="|">"|"<"  { yylval.op = strdup(yytext); return RELOP; }
 "+"|"-"|"*"|"/"          { yylval.op = strdup(yytext); return ADDOP; }
