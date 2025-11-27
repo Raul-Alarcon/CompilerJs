@@ -226,7 +226,7 @@ void printAST(ASTNode *node, int level)
         printAST(node->body, level + 4);
         break;
     case NODE_STRING:
-        printf("%sSTRING(%s)\n", indent(level), node->id);
+        printf("%sSTRING(%s)\n", indent(level), node->str);
         break;
     case NODE_BOOL:
         printf("%sBOOL(%s)\n", indent(level), node->num ? "true" : "false");
