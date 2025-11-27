@@ -120,6 +120,33 @@ ASTNode *newFor(ASTNode *init, ASTNode *cond, ASTNode *step, ASTNode *body)
     return node;
 }
 
+ASTNode *newString(char *value)
+{
+    ASTNode *n = calloc(1, sizeof(ASTNode));
+    n->type = NODE_STRING;
+    n->str = strdup(value);  
+    return n;
+}
+
+
+ASTNode *newBool(int value)
+{
+    ASTNode *n = calloc(1, sizeof(ASTNode));
+    n->type = NODE_BOOL;
+    n->num = value;
+    return n;
+}
+
+ASTNode *newVarDecl(char *id, Type type, ASTNode *expr)
+{
+    ASTNode *n = calloc(1, sizeof(ASTNode));
+    n->type = NODE_VARDECL;
+    n->id = strdup(id);
+    n->varType = type;
+    n->left = expr;
+    return n;
+}
+
 void printAST(ASTNode *node, int level)
 {
     if (!node)
@@ -198,6 +225,25 @@ void printAST(ASTNode *node, int level)
         printf("%sBody:\n", indent(level + 2));
         printAST(node->body, level + 4);
         break;
+    case NODE_STRING:
+        printf("%sSTRING(%s)\n", indent(level), node->id);
+        break;
+    case NODE_BOOL:
+        printf("%sBOOL(%s)\n", indent(level), node->num ? "true" : "false");
+        break;
+    case NODE_VARDECL:
+        printf("%sVARDECL %s : ", indent(level), node->id);
+        if (node->varType == TYPE_NUMBER)
+            printf("NUMBER\n");
+        else if (node->varType == TYPE_STRING)
+            printf("STRING\n");
+        else if (node->varType == TYPE_BOOL)
+            printf("BOOL\n");
+        else
+            printf("UNKNOWN\n");
+        printAST(node->left, level + 2);
+        break;
+
     default:
         printf("%sUNKNOWN\n", indent(level));
         break;

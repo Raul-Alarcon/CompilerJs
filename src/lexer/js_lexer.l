@@ -10,6 +10,9 @@
 
 "let"|"const"|"var"      { return VAR; }
 "function"               { return FUNCTION; }
+"int"                    { return INT; }
+"string"                 { return STRING_TYPE; }
+"bool"                   { return BOOL_TYPE; }
 "if"                     { return IF; }
 "else"                   { return ELSE; }
 "while"                  { return WHILE; }

@@ -15,7 +15,7 @@ typedef struct Symbol {
 extern Symbol* symbol_table[TABLE_SIZE];
 
 void insert_symbol(const char* name, Type type);
-Symbol* lookup_symbol(const char* name);
+Symbol* lookup_symbol(const char* name); 
 void enter_scope();
 void exit_scope();
 

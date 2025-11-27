@@ -13,6 +13,11 @@ char *newLabel()
 }
 int newTemp() { return temp++; }
 
+static void emit_string_literal(const char *s, int t)
+{
+    printf("t%d = \"%s\"\n", t, s);
+}
+
 int generate_expr(ASTNode *node)
 {
     switch (node->type)
@@ -25,10 +30,16 @@ int generate_expr(ASTNode *node)
         return t;
     }
 
-    case NODE_ID:
+    case NODE_STRING:
     {
         int t = newTemp();
-        printf("t%d = %s\n", t, node->id);
+        emit_string_literal(node->str ? node->str : "", t);
+        return t;
+    }
+    case NODE_BOOL:
+    {
+        int t = newTemp();
+        printf("t%d = %d\n", t, node->num ? 1 : 0); // true -> 1, false -> 0
         return t;
     }
 
@@ -37,9 +48,38 @@ int generate_expr(ASTNode *node)
         int l = generate_expr(node->left);
         int r = generate_expr(node->right);
         int t = newTemp();
-        printf("t%d = t%d %s t%d\n", t, l, node->op, r);
+
+        // Heurística simple: si alguno de los operandos es string literal or node type STRING,
+        // emitimos CONCAT si op == "+"
+        int leftIsString = (node->left && node->left->type == NODE_STRING);
+        int rightIsString = (node->right && node->right->type == NODE_STRING);
+
+        if ((leftIsString || rightIsString) && node->op && strcmp(node->op, "+") == 0)
+        {
+            printf("t%d = concat t%d t%d\n", t, l, r);
+        }
+        else
+        {
+            printf("t%d = t%d %s t%d\n", t, l, node->op ? node->op : "?", r);
+        }
         return t;
     }
+
+    case NODE_ID:
+    {
+        int t = newTemp();
+        printf("t%d = %s\n", t, node->id);
+        return t;
+    }
+
+        // case NODE_BINOP:
+        // {
+        //     int l = generate_expr(node->left);
+        //     int r = generate_expr(node->right);
+        //     int t = newTemp();
+        //     printf("t%d = t%d %s t%d\n", t, l, node->op, r);
+        //     return t;
+        // }
 
     default:
         printf("ERROR: expresión inválida\n");
@@ -53,6 +93,25 @@ void generate_stmt(ASTNode *node)
     switch (node->type)
     {
 
+    case NODE_VARDECL:
+    { 
+        const char *name = node->id ? node->id : "<anon>";
+        const char *typename = "UNKNOWN";
+        if (node->varType == TYPE_NUMBER)
+            typename = "NUMBER";
+        else if (node->varType == TYPE_STRING)
+            typename = "STRING";
+        else if (node->varType == TYPE_BOOL)
+            typename = "BOOL";
+
+        printf("DECLARE %s : %s\n", name, typename);
+        if (node->left)
+        {
+            int t = generate_expr(node->left);
+            printf("STORE %s <- t%d\n", name, t);
+        }
+        break;
+    }
     case NODE_ASSIGN:
     {
         int t = generate_expr(node->left);
@@ -139,17 +198,17 @@ void generate_stmt(ASTNode *node)
         char *Lstart = newLabel();
         char *Lbody = newLabel();
         char *Lend = newLabel();
- 
+
         printf("%s:\n", Lstart);
- 
+
         int cond = generate_expr(node->left);
         printf("IF t%d GOTO %s\n", cond, Lbody);
         printf("GOTO %s\n", Lend);
- 
+
         printf("%s:\n", Lbody);
         generate_stmt(node->right);
- 
-        printf("GOTO %s\n", Lstart); 
+
+        printf("GOTO %s\n", Lstart);
         printf("%s:\n", Lend);
 
         break;
